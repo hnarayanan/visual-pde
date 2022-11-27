@@ -1,0 +1,29 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: white;
+}
+
+canvas {
+    display: block;
+    margin: auto;
+    touch-action: none;
+    width: 100vw;
+    height: 100vh;
+}
+
+.fullCanvas {
+    width: 100vw;
+    height: 100vh;
+}
+
+.squareCanvas {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vh;
+    max-height: 100vw;
+}
+
+.dg .a {
+    margin-right: 15px;
+}
