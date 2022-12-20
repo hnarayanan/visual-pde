@@ -40,7 +40,7 @@ import {
   hLineShader,
   drawShaderBot,
   drawShaderTop,
-} from "../drawing_shaders.js";
+} from "./drawing_shaders.js";
 import { copyShader } from "../copy_shader.js";
 import {
   RDShaderTop,
@@ -51,10 +51,10 @@ import {
   RDShaderUpdate,
 } from "./simulation_shaders.js";
 import { randShader } from "../rand_shader.js";
-import { greyscaleDisplay, fiveColourDisplay } from "../display_shaders.js";
+import { greyscaleDisplay, fiveColourDisplay } from "./display_shaders.js";
 import { genericVertexShader } from "../generic_shaders.js";
 import { getPreset } from "./presets.js";
-import { clearShaderBot, clearShaderTop } from "../clear_shader.js";
+import { clearShaderBot, clearShaderTop } from "./clear_shader.js";
 
 // Setup some configurable options.
 options = {};
@@ -71,12 +71,25 @@ funsObj = {
       playSim();
     }
   },
-  copyConfig: function () {
+  copyConfigAsURL: function () {
+    let objDiff = diffObjects(options, getPreset("default"));
+    objDiff.preset = "Custom";
     let str = [
       location.href.replace(location.search, ""),
       "?options=",
-      encodeURI(btoa(JSON.stringify(options))),
+      encodeURI(btoa(JSON.stringify(objDiff))),
     ].join("");
+    navigator.clipboard.writeText(str);
+  },
+  copyConfigAsJSON: function () {
+    let objDiff = diffObjects(options, getPreset("default"));
+    objDiff.preset = "PRESETNAME";
+    let str = JSON.stringify(objDiff)
+      .replaceAll(",", ",\n\t")
+      .replaceAll(":", ": ")
+      .replace("{", "{\n\t")
+      .replace("}", ",\n}");
+    str = "case: PRESETNAME:\n\toptions = " + str + ";\nbreak;";
     navigator.clipboard.writeText(str);
   },
 };
@@ -436,10 +449,16 @@ function initGUI(startOpen) {
   }
   clearButton = gui.add(funsObj, "clear").name("Clear (c)");
 
-  if (options.showCopyButton) {
+  if (inGUI("copyConfigAsURL")) {
     // Copy configuration as URL.
-    gui.add(funsObj, "copyConfig").name("Copy setup URL (s)");
+    gui.add(funsObj, "copyConfigAsURL").name("Copy setup URL (s)");
   }
+
+  if (inGUI("copyConfigAsJSON")) {
+    // Copy configuration as raw JSON.
+    gui.add(funsObj, "copyConfigAsJSON").name("Copy setup JSON");
+  }
+
   if (startOpen != undefined && startOpen) {
     gui.open();
   } else {
@@ -771,6 +790,10 @@ function initGUI(startOpen) {
   ) {
     genericOptionsFolder.hide();
   }
+
+  // Make sure we're showing/hiding the correct parts of the GUI.
+  setNumberOfSpecies();
+  setBCsEqs();
 }
 
 function animate() {
@@ -981,6 +1004,7 @@ function clearTextures() {
   renderer.render(simScene, simCamera);
   renderer.setRenderTarget(simTextureB);
   renderer.render(simScene, simCamera);
+  render();
 }
 
 function pauseSim() {
@@ -1070,10 +1094,10 @@ function setRDEquations() {
   }
 
   // Insert any user-defined kinetic parameters, given as a string that needs parsing.
-  // Extract variable definitions, separated by commas or semicolons, ignoring whitespace.
+  // Extract variable definitions, separated by semicolons only, ignoring whitespace.
   // We'll inject this shader string before any boundary conditions etc, so that these params
   // are also available in BCs.
-  let regex = /[,;\s]*(.+?)(?:$|[,;])+/g;
+  let regex = /[;\s]*(.+?)(?:$|[;])+/g;
   let kineticStr = parseShaderString(
     options.kineticParams.replace(regex, "float $1;\n")
   );
@@ -1096,6 +1120,9 @@ function parseRobinRHS(string, species) {
 }
 
 function loadPreset(preset) {
+  // First, reload the default preset.
+  loadOptions("default");
+
   // Updates the values stored in options.
   loadOptions(preset);
 
@@ -1118,10 +1145,6 @@ function loadPreset(preset) {
 
   // Set the draw and display shaders.
   setDrawAndDisplayShaders();
-
-  // Set the display color and brush type.
-  setDisplayColourAndType();
-  setBrushType();
 
   // To get around an annoying bug in dat.gui.image, in which the
   // controller doesn't update the value of the underlying property,
@@ -1187,13 +1210,10 @@ function deleteGUI(folder) {
     }
     // Delete all the controllers at this level.
     for (let i = 0; i < folder.__controllers.length; i++) {
-      console.log(folder.__controllers[i]);
       folder.__controllers[i].remove();
     }
     // If this is the top-level GUI, destroy it.
-    console.log(folder);
     if (folder == gui) {
-      console.log("Here");
       gui.destroy();
     }
   }
@@ -1215,11 +1235,7 @@ function setNumberOfSpecies() {
       updateUniforms();
 
       // Hide GUI panels related to v.
-      hideGUIController(DvController);
-      hideGUIController(gController);
-      hideGUIController(whatToPlotController);
-      hideGUIController(clearValueVController);
-      hideGUIController(vBCsController);
+      hideVGUIPanels();
 
       // Remove references to v in labels.
       if (fController != undefined) {
@@ -1229,11 +1245,7 @@ function setNumberOfSpecies() {
       break;
     case 2:
       // Show GUI panels related to v.
-      showGUIController(DvController);
-      showGUIController(gController);
-      showGUIController(whatToPlotController);
-      showGUIController(clearValueVController);
-      showGUIController(vBCsController);
+      showVGUIPanels();
 
       // Ensure correct references to v in labels are present.
       if (fController != undefined) {
@@ -1381,4 +1393,28 @@ function inGUI(name) {
 function setShowAllToolsFlag() {
   showAllStandardTools =
     options.showAllOptionsOverride || options.onlyExposeOptions.length == 0;
+}
+
+function showVGUIPanels() {
+  showGUIController(DvController);
+  showGUIController(gController);
+  showGUIController(whatToPlotController);
+  showGUIController(clearValueVController);
+  showGUIController(vBCsController);
+}
+
+function hideVGUIPanels() {
+  hideGUIController(DvController);
+  hideGUIController(gController);
+  hideGUIController(whatToPlotController);
+  hideGUIController(clearValueVController);
+  hideGUIController(vBCsController);
+}
+
+function diffObjects(o1, o2) {
+  return Object.fromEntries(
+    Object.entries(o1).filter(
+      ([k, v]) => JSON.stringify(o2[k]) !== JSON.stringify(v)
+    )
+  );
 }
