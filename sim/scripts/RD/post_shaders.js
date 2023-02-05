@@ -3,6 +3,7 @@
 export function computeDisplayFunShaderTop() {
     return `varying vec2 textureCoords;
     uniform sampler2D textureSource;
+
     void main()
     {
        `
@@ -13,12 +14,14 @@ export function computeDisplayFunShaderBot() {
         vec4 uvw = texture2D(textureSource, textureCoords);
         float value = FUN;
         gl_FragColor = vec4(value, 0.0, 0.0, 1.0);
+
     }`
 }
 
 export function computeMaxSpeciesShader() {
     return `varying vec2 textureCoords;
     uniform sampler2D textureSource;
+
     void main()
     {
         float value = 0.0;
