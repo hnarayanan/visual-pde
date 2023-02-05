@@ -12,11 +12,22 @@ let options, uniforms, funsObj;
 let gui,
   root,
   pauseButton,
-  clearButton,
+  resetButton,
   brushRadiusController,
+  lockCFLController,
   fController,
   gController,
   hController,
+  DuuController,
+  DuvController,
+  DuwController,
+  DvuController,
+  DvvController,
+  DvwController,
+  DwuController,
+  DwvController,
+  DwwController,
+  DuController,
   DvController,
   DwController,
   dtController,
@@ -53,7 +64,8 @@ import {
   drawShaderTop,
 } from "./drawing_shaders.js";
 import {
-  computeDisplayFunShader,
+  computeDisplayFunShaderTop,
+  computeDisplayFunShaderBot,
   computeMaxSpeciesShader,
 } from "./post_shaders.js";
 import { copyShader } from "../copy_shader.js";
@@ -64,6 +76,7 @@ import {
   RDShaderNoFlux,
   RDShaderRobin,
   RDShaderUpdate,
+  RDShaderUpdateCross,
 } from "./simulation_shaders.js";
 import { randShader } from "../rand_shader.js";
 import { fiveColourDisplay, largestSpeciesShader } from "./display_shaders.js";
@@ -75,9 +88,8 @@ import { clearShaderBot, clearShaderTop } from "./clear_shader.js";
 options = {};
 
 funsObj = {
-  clear: function () {
-    clearTextures();
-    uniforms.time.value = 0.0;
+  reset: function () {
+    resetSim();
   },
   pause: function () {
     if (isRunning) {
@@ -99,6 +111,11 @@ funsObj = {
   copyConfigAsJSON: function () {
     let objDiff = diffObjects(options, getPreset("default"));
     objDiff.preset = "PRESETNAME";
+    if (objDiff.hasOwnProperty("kineticParams")) {
+      // If kinetic params have been specified, replace any commas with semicolons
+      // to allow for pretty formatting of the JSON.
+      objDiff.kineticParams = objDiff.kineticParams.replaceAll(",", ";");
+    }
     let str = JSON.stringify(objDiff)
       .replaceAll(",", ",\n\t")
       .replaceAll(":", ": ")
@@ -148,7 +165,6 @@ animate();
 //---------------
 
 function init() {
-  isRunning = true;
   isDrawing = false;
 
   // Create a renderer.
@@ -247,6 +263,7 @@ function init() {
 
   // Show/hide any GUI elements based on current options.
   setNumberOfSpecies();
+  setNonConstantDiffusionGUI();
 
   // Set the size of the domain and related parameters.
   resize();
@@ -256,7 +273,7 @@ function init() {
   setClearShader();
 
   // Set the initial condition.
-  clearTextures();
+  resetSim();
 
   // Listen for pointer events.
   canvas.addEventListener("pointerdown", onDocumentPointerDown);
@@ -269,8 +286,8 @@ function init() {
     var targetTagName =
       target.nodeType == 1 ? target.nodeName.toUpperCase() : "";
     if (!/INPUT|SELECT|TEXTAREA/.test(targetTagName)) {
-      if (event.key === "c") {
-        funsObj.clear();
+      if (event.key === "r") {
+        funsObj.reset();
       }
       if (event.key === " ") {
         if (isRunning) {
@@ -488,7 +505,7 @@ function initGUI(startOpen) {
   } else {
     pauseButton.name("Play (space)");
   }
-  clearButton = gui.add(funsObj, "clear").name("Clear (c)");
+  resetButton = gui.add(funsObj, "reset").name("Reset (r)");
 
   if (inGUI("copyConfigAsURL")) {
     // Copy configuration as URL.
@@ -594,7 +611,7 @@ function initGUI(startOpen) {
     dtController.updateDisplay();
   }
   if (inGUI("setTimestepForStability")) {
-    root
+    lockCFLController = root
       .add(options, "setTimestepForStability")
       .name("Lock CFL cond.")
       .onChange(setTimestepForCFL);
@@ -613,11 +630,28 @@ function initGUI(startOpen) {
       .name("No. species")
       .onChange(setNumberOfSpecies);
   }
+  // Number of species.
+  if (inGUI("constantDiffusion")) {
+    root
+      .add(options, "constantDiffusion")
+      .name("Const. D?")
+      .onChange(function () {
+        setNonConstantDiffusionGUI();
+        setRDEquations();
+        if (!options.constantDiffusion) {
+          options.setTimestepForStability = false;
+          refreshGUI(gui);
+          hideGUIController(lockCFLController);
+        } else {
+          showGUIController(lockCFLController);
+        }
+      });
+  }
   // Du and Dv.
   if (inGUI("diffusionUStr")) {
-    const DuController = root
+    DuController = root
       .add(options, "diffusionUStr")
-      .name("Du")
+      .name("D<sub>u<sub>")
       .onFinishChange(function () {
         updateDiffusionCoeffs();
         setTimestepForCFL();
@@ -627,7 +661,7 @@ function initGUI(startOpen) {
   if (inGUI("diffusionVStr")) {
     DvController = root
       .add(options, "diffusionVStr")
-      .name("Dv")
+      .name("D<sub>v<sub>")
       .onFinishChange(function () {
         updateDiffusionCoeffs();
         setTimestepForCFL();
@@ -637,12 +671,66 @@ function initGUI(startOpen) {
   if (inGUI("diffusionWStr")) {
     DwController = root
       .add(options, "diffusionWStr")
-      .name("Dw")
+      .name("D<sub>w<sub>")
       .onFinishChange(function () {
         updateDiffusionCoeffs();
         setTimestepForCFL();
         updateUniforms();
       });
+  }
+  if (inGUI("nonconstantDiffusionStrUU")) {
+    DuuController = root
+      .add(options, "nonconstantDiffusionStrUU")
+      .name("D<sub>uu<sub>")
+      .onFinishChange(setRDEquations);
+  }
+  if (inGUI("nonconstantDiffusionStrUV")) {
+    DuvController = root
+      .add(options, "nonconstantDiffusionStrUV")
+      .name("D<sub>uv<sub>")
+      .onFinishChange(setRDEquations);
+  }
+  if (inGUI("nonconstantDiffusionStrUW")) {
+    DuwController = root
+      .add(options, "nonconstantDiffusionStrUW")
+      .name("D<sub>uw<sub>")
+      .onFinishChange(setRDEquations);
+  }
+  if (inGUI("nonconstantDiffusionStrVU")) {
+    DvuController = root
+      .add(options, "nonconstantDiffusionStrVU")
+      .name("D<sub>vu<sub>")
+      .onFinishChange(setRDEquations);
+  }
+  if (inGUI("nonconstantDiffusionStrVV")) {
+    DvvController = root
+      .add(options, "nonconstantDiffusionStrVV")
+      .name("D<sub>vv<sub>")
+      .onFinishChange(setRDEquations);
+  }
+  if (inGUI("nonconstantDiffusionStrVW")) {
+    DvwController = root
+      .add(options, "nonconstantDiffusionStrVW")
+      .name("D<sub>vw<sub>")
+      .onFinishChange(setRDEquations);
+  }
+  if (inGUI("nonconstantDiffusionStrWU")) {
+    DwuController = root
+      .add(options, "nonconstantDiffusionStrWU")
+      .name("D<sub>wu<sub>")
+      .onFinishChange(setRDEquations);
+  }
+  if (inGUI("nonconstantDiffusionStrWV")) {
+    DwvController = root
+      .add(options, "nonconstantDiffusionStrWV")
+      .name("D<sub>wv<sub>")
+      .onFinishChange(setRDEquations);
+  }
+  if (inGUI("nonconstantDiffusionStrWW")) {
+    DwwController = root
+      .add(options, "nonconstantDiffusionStrWW")
+      .name("D<sub>ww<sub>")
+      .onFinishChange(setRDEquations);
   }
   if (inGUI("reactionStrU")) {
     // Custom f(u,v) and g(u,v).
@@ -667,7 +755,11 @@ function initGUI(startOpen) {
     root
       .add(options, "kineticParams")
       .name("Kinetic params")
-      .onFinishChange(setRDEquations);
+      .onFinishChange(function () {
+        setRDEquations();
+        setClearShader();
+        setPostFunFragShader();
+      });
   }
 
   // Boundary conditions folder.
@@ -824,19 +916,19 @@ function initGUI(startOpen) {
   if (inGUI("clearValueU")) {
     clearValueUController = root
       .add(options, "clearValueU")
-      .name("u on clear")
+      .name("Initial u")
       .onFinishChange(setClearShader);
   }
   if (inGUI("clearValueV")) {
     clearValueVController = root
       .add(options, "clearValueV")
-      .name("v on clear")
+      .name("Initial v")
       .onFinishChange(setClearShader);
   }
   if (inGUI("clearValueW")) {
     clearValueWController = root
       .add(options, "clearValueW")
-      .name("w on clear")
+      .name("Initial w")
       .onFinishChange(setClearShader);
   }
   if (inGUI("preset")) {
@@ -956,9 +1048,7 @@ function setDisplayColourAndType() {
     uniforms.colour4.value = new THREE.Vector4(0.75, 0.75, 0.75, 0.75);
     uniforms.colour5.value = new THREE.Vector4(1, 1, 1, 1);
     displayMaterial.fragmentShader = fiveColourDisplay();
-    postMaterial.fragmentShader = setDisplayFunInShader(
-      computeDisplayFunShader()
-    );
+    setPostFunFragShader();
   } else if (options.colourmap == "BlackGreenYellowRedWhite") {
     uniforms.colour1.value = new THREE.Vector4(0, 0, 0.0, 0);
     uniforms.colour2.value = new THREE.Vector4(0, 1, 0, 0.25);
@@ -966,9 +1056,7 @@ function setDisplayColourAndType() {
     uniforms.colour4.value = new THREE.Vector4(1, 0, 0, 0.75);
     uniforms.colour5.value = new THREE.Vector4(1, 1, 1, 1.0);
     displayMaterial.fragmentShader = fiveColourDisplay();
-    postMaterial.fragmentShader = setDisplayFunInShader(
-      computeDisplayFunShader()
-    );
+    setPostFunFragShader();
   } else if (options.colourmap == "viridis") {
     uniforms.colour1.value = new THREE.Vector4(0.267, 0.0049, 0.3294, 0.0);
     uniforms.colour2.value = new THREE.Vector4(0.2302, 0.3213, 0.5455, 0.25);
@@ -976,9 +1064,7 @@ function setDisplayColourAndType() {
     uniforms.colour4.value = new THREE.Vector4(0.3629, 0.7867, 0.3866, 0.75);
     uniforms.colour5.value = new THREE.Vector4(0.9932, 0.9062, 0.1439, 1.0);
     displayMaterial.fragmentShader = fiveColourDisplay();
-    postMaterial.fragmentShader = setDisplayFunInShader(
-      computeDisplayFunShader()
-    );
+    setPostFunFragShader();
   } else if (options.colourmap == "turbo") {
     uniforms.colour1.value = new THREE.Vector4(0.19, 0.0718, 0.2322, 0.0);
     uniforms.colour2.value = new THREE.Vector4(0.1602, 0.7332, 0.9252, 0.25);
@@ -986,11 +1072,10 @@ function setDisplayColourAndType() {
     uniforms.colour4.value = new THREE.Vector4(0.9853, 0.5018, 0.1324, 0.75);
     uniforms.colour5.value = new THREE.Vector4(0.4796, 0.01583, 0.01055, 1.0);
     displayMaterial.fragmentShader = fiveColourDisplay();
-    postMaterial.fragmentShader = setDisplayFunInShader(
-      computeDisplayFunShader()
-    );
+    setPostFunFragShader();
   }
   displayMaterial.needsUpdate = true;
+  postMaterial.needsUpdate = true;
   render();
 }
 
@@ -1117,6 +1202,11 @@ function playSim() {
   isRunning = true;
 }
 
+function resetSim() {
+  clearTextures();
+  uniforms.time.value = 0.0;
+}
+
 function parseReactionStrings() {
   // Parse the user-defined shader strings into valid GLSL and output their concatenation. We won't worry about code injection.
   let out = "";
@@ -1128,6 +1218,80 @@ function parseReactionStrings() {
   // Prepare the w string.
   out += "float h = " + parseShaderString(options.reactionStrW) + ";\n";
 
+  return out;
+}
+
+function parseCrossDiffusionStrings() {
+  // Parse the user-defined shader strings into valid GLSL and output their concatenation. We won't worry about code injection.
+  let out = "";
+
+  // Prepare Duu, evaluating it at five points.
+  out += constantDiffusionEvaluateInSpaceStr(
+    parseShaderString(options.nonconstantDiffusionStrUU) + ";\n",
+    "uu"
+  );
+
+  // Prepare Duv, evaluating it at five points.
+  out += constantDiffusionEvaluateInSpaceStr(
+    parseShaderString(options.nonconstantDiffusionStrUV) + ";\n",
+    "uv"
+  );
+
+  // Prepare Duw, evaluating it at five points.
+  out += constantDiffusionEvaluateInSpaceStr(
+    parseShaderString(options.nonconstantDiffusionStrUW) + ";\n",
+    "uw"
+  );
+
+  // Prepare Dvu, evaluating it at five points.
+  out += constantDiffusionEvaluateInSpaceStr(
+    parseShaderString(options.nonconstantDiffusionStrVU) + ";\n",
+    "vu"
+  );
+
+  // Prepare Dvv, evaluating it at five points.
+  out += constantDiffusionEvaluateInSpaceStr(
+    parseShaderString(options.nonconstantDiffusionStrVV) + ";\n",
+    "vv"
+  );
+
+  // Prepare Dvw, evaluating it at five points.
+  out += constantDiffusionEvaluateInSpaceStr(
+    parseShaderString(options.nonconstantDiffusionStrVW) + ";\n",
+    "vw"
+  );
+
+  // Prepare Dwu, evaluating it at five points.
+  out += constantDiffusionEvaluateInSpaceStr(
+    parseShaderString(options.nonconstantDiffusionStrWU) + ";\n",
+    "wu"
+  );
+
+  // Prepare Dwv, evaluating it at five points.
+  out += constantDiffusionEvaluateInSpaceStr(
+    parseShaderString(options.nonconstantDiffusionStrWV) + ";\n",
+    "wv"
+  );
+
+  // Prepare Dww, evaluating it at five points.
+  out += constantDiffusionEvaluateInSpaceStr(
+    parseShaderString(options.nonconstantDiffusionStrWW) + ";\n",
+    "ww"
+  );
+
+  return out;
+}
+
+function constantDiffusionEvaluateInSpaceStr(str, label) {
+  let out = "";
+  let xRegex = /(?![^x])*x(?=[^x])*/g;
+  let yRegex = /(?![^y])*y(?=[^y])*/g;
+
+  out += "float D" + label + " = " + str;
+  out += "float D" + label + "L = " + str.replaceAll(xRegex, "(x-dx)");
+  out += "float D" + label + "R = " + str.replaceAll(xRegex, "(x+dx)");
+  out += "float D" + label + "T = " + str.replaceAll(yRegex, "(y+dy)");
+  out += "float D" + label + "B = " + str.replaceAll(yRegex, "(y-dy)");
   return out;
 }
 
@@ -1162,6 +1326,7 @@ function setRDEquations() {
   let noFluxSpecies = "";
   let dirichletShader = "";
   let robinShader = "";
+  let updateShader = "";
 
   // Record no-flux species.
   if (options.boundaryConditionsU == "noflux") {
@@ -1212,13 +1377,20 @@ function setRDEquations() {
   }
 
   // Insert any user-defined kinetic parameters, given as a string that needs parsing.
-  // Extract variable definitions, separated by semicolons only, ignoring whitespace.
+  // Extract variable definitions, separated by semicolons or commas, ignoring whitespace.
   // We'll inject this shader string before any boundary conditions etc, so that these params
   // are also available in BCs.
-  let regex = /[;\s]*(.+?)(?:$|[;])+/g;
+  let regex = /[;,\s]*(.+?)(?:$|[;,])+/g;
   let kineticStr = parseShaderString(
     options.kineticParams.replace(regex, "float $1;\n")
   );
+
+  // Choose what sort of update we are doing: normal, or cross-diffusion enabled?
+  if (!options.constantDiffusion) {
+    updateShader = parseCrossDiffusionStrings() + "\n" + RDShaderUpdateCross();
+  } else {
+    updateShader = RDShaderUpdate();
+  }
 
   simMaterial.fragmentShader = [
     RDShaderTop(),
@@ -1226,7 +1398,7 @@ function setRDEquations() {
     selectSpeciesInShaderStr(RDShaderNoFlux(), noFluxSpecies),
     robinShader,
     parseReactionStrings(),
-    RDShaderUpdate(),
+    updateShader,
     dirichletShader,
     RDShaderBot(),
   ].join(" ");
@@ -1249,6 +1421,7 @@ function loadPreset(preset) {
   initGUI();
 
   setNumberOfSpecies();
+  setNonConstantDiffusionGUI();
   if (gui != undefined) {
     // Refresh the whole gui.
     refreshGUI(gui);
@@ -1263,6 +1436,9 @@ function loadPreset(preset) {
   // Set the draw, display, and clear shaders.
   setDrawAndDisplayShaders();
   setClearShader();
+
+  // Reset the state of the simulation.
+  resetSim();
 
   // To get around an annoying bug in dat.gui.image, in which the
   // controller doesn't update the value of the underlying property,
@@ -1304,6 +1480,9 @@ function loadOptions(preset) {
 
   // Set a flag if we will be showing all tools.
   setShowAllToolsFlag();
+
+  // Check if the simulation should be running on load.
+  isRunning = options.runningOnLoad;
 
   // Compute any derived values.
   updateDiffusionCoeffs();
@@ -1348,8 +1527,19 @@ function setNumberOfSpecies() {
       updateWhatToPlot();
 
       // Set the diffusion of v and w to zero to prevent them from causing numerical instability.
-      options.diffusionV = 0;
-      options.diffusionW = 0;
+      if (!options.constantDiffusion) {
+        options.nonconstantDiffusionStrUV = "0.0";
+        options.nonconstantDiffusionStrUW = "0.0";
+        options.nonconstantDiffusionStrVU = "0.0";
+        options.nonconstantDiffusionStrVV = "0.0";
+        options.nonconstantDiffusionStrVW = "0.0";
+        options.nonconstantDiffusionStrWU = "0.0";
+        options.nonconstantDiffusionStrWV = "0.0";
+        options.nonconstantDiffusionStrWW = "0.0";
+      } else {
+        options.diffusionV = 0;
+        options.diffusionW = 0;
+      }
 
       // Set v and w to be periodic to reduce computational overhead.
       options.boundaryConditionsV = "periodic";
@@ -1380,7 +1570,13 @@ function setNumberOfSpecies() {
       }
 
       // Set the diffusion of w to zero to prevent it from causing numerical instability.
-      options.diffusionW = 0;
+      if (!options.constantDiffusion) {
+        options.nonconstantDiffusionStrUV = "0.0";
+        options.nonconstantDiffusionStrVU = "0.0";
+        options.nonconstantDiffusionStrVV = "0.0";
+      } else {
+        options.diffusionW = 0;
+      }
 
       // Set w to be periodic to reduce computational overhead.
       options.boundaryConditionsW = "periodic";
@@ -1417,6 +1613,15 @@ function setNumberOfSpecies() {
       }
   }
   refreshGUI(gui);
+}
+
+function setTypeOfDiffusion() {
+  if (!options.constantDiffusion) {
+    // Show all panels related to nonconstant diffusion.
+    showGUIController();
+
+    // Hide all panels related to constant diffusion.
+  }
 }
 
 function hideGUIController(cont) {
@@ -1468,6 +1673,8 @@ function speciesToChannelInd(speciesStr) {
 function setBCsEqs() {
   // Configure the shaders.
   setRDEquations();
+
+  setNonConstantDiffusionGUI();
 
   // Update the GUI.
   if (options.boundaryConditionsU == "dirichlet") {
@@ -1530,6 +1737,15 @@ function setClearShader() {
   ) {
     shaderStr += randShader();
   }
+  // Insert any user-defined kinetic parameters, given as a string that needs parsing.
+  // Extract variable definitions, separated by semicolons or commas, ignoring whitespace.
+  // We'll inject this shader string before any boundary conditions etc, so that these params
+  // are also available in BCs.
+  let regex = /[;,\s]*(.+?)(?:$|[;,])+/g;
+  let kineticStr = parseShaderString(
+    options.kineticParams.replace(regex, "float $1;\n")
+  );
+  shaderStr += kineticStr;
   shaderStr += "float u = " + parseShaderString(options.clearValueU) + ";\n";
   shaderStr += "float v = " + parseShaderString(options.clearValueV) + ";\n";
   shaderStr += "float w = " + parseShaderString(options.clearValueW) + ";\n";
@@ -1567,23 +1783,16 @@ function createImageController() {
 
 function updateWhatToPlot() {
   if (options.whatToPlot == "MAX") {
-    postMaterial.fragmentShader = computeMaxSpeciesShader();
-    options.minColourValue = 0.0;
-    options.maxColourValue = 1.0;
-    updateUniforms();
+    setPostFunMaxFragShader();
     hideGUIController(minColourValueController);
     hideGUIController(maxColourValueController);
     hideGUIController(autoMinMaxColourRangeController);
-  }
-  else {
-    postMaterial.fragmentShader = setDisplayFunInShader(
-      computeDisplayFunShader()
-    );
+  } else {
+    setPostFunFragShader();
     showGUIController(minColourValueController);
     showGUIController(maxColourValueController);
     showGUIController(autoMinMaxColourRangeController);
   }
-  postMaterial.needsUpdate = true;
   render();
 }
 
@@ -1597,14 +1806,28 @@ function setShowAllToolsFlag() {
 }
 
 function showVGUIPanels() {
-  showGUIController(DvController);
+  if (!options.constantDiffusion) {
+    showGUIController(DuvController);
+    showGUIController(DvuController);
+    showGUIController(DvvController);
+  } else {
+    showGUIController(DvController);
+  }
   showGUIController(gController);
   showGUIController(clearValueVController);
   showGUIController(vBCsController);
 }
 
 function showWGUIPanels() {
-  showGUIController(DwController);
+  if (!options.constantDiffusion) {
+    showGUIController(DuwController);
+    showGUIController(DvwController);
+    showGUIController(DwuController);
+    showGUIController(DwvController);
+    showGUIController(DwwController);
+  } else {
+    showGUIController(DwController);
+  }
   showGUIController(hController);
   showGUIController(clearValueWController);
   showGUIController(wBCsController);
@@ -1612,6 +1835,9 @@ function showWGUIPanels() {
 
 function hideVGUIPanels() {
   hideGUIController(DvController);
+  hideGUIController(DuvController);
+  hideGUIController(DvuController);
+  hideGUIController(DvvController);
   hideGUIController(gController);
   hideGUIController(clearValueVController);
   hideGUIController(vBCsController);
@@ -1619,6 +1845,11 @@ function hideVGUIPanels() {
 
 function hideWGUIPanels() {
   hideGUIController(DwController);
+  hideGUIController(DuwController);
+  hideGUIController(DvwController);
+  hideGUIController(DwuController);
+  hideGUIController(DwvController);
+  hideGUIController(DwwController);
   hideGUIController(hController);
   hideGUIController(clearValueWController);
   hideGUIController(wBCsController);
@@ -1662,4 +1893,84 @@ function updateDiffusionCoeffs() {
   options.diffusionU = evaluateDiffusionStr(options.diffusionUStr);
   options.diffusionV = evaluateDiffusionStr(options.diffusionVStr);
   options.diffusionW = evaluateDiffusionStr(options.diffusionWStr);
+}
+
+function setPostFunFragShader() {
+  let shaderStr = computeDisplayFunShaderTop();
+  let regex = /[;,\s]*(.+?)(?:$|[;,])+/g;
+  let kineticStr = parseShaderString(
+    options.kineticParams.replace(regex, "float $1;\n")
+  );
+  shaderStr += kineticStr;
+  shaderStr += computeDisplayFunShaderBot();
+  postMaterial.fragmentShader = setDisplayFunInShader(shaderStr);
+  postMaterial.needsUpdate = true;
+}
+
+function setPostFunMaxFragShader() {
+  postMaterial.fragmentShader = computeMaxSpeciesShader();
+  postMaterial.needsUpdate = true;
+  options.minColourValue = 0.0;
+  options.maxColourValue = 1.0;
+  updateUniforms();
+}
+
+function setNonConstantDiffusionGUI() {
+  switch (parseInt(options.numSpecies)) {
+    case 1:
+      if (!options.constantDiffusion) {
+        hideGUIController(DuController);
+        showGUIController(DuuController);
+      } else {
+        showGUIController(DuController);
+        hideGUIController(DuuController);
+      }
+      break;
+    case 2:
+      if (!options.constantDiffusion) {
+        hideGUIController(DuController);
+        hideGUIController(DvController);
+        showGUIController(DuuController);
+        showGUIController(DuvController);
+        showGUIController(DvuController);
+        showGUIController(DvvController);
+      } else {
+        showGUIController(DuController);
+        showGUIController(DvController);
+        hideGUIController(DuuController);
+        hideGUIController(DuvController);
+        hideGUIController(DvuController);
+        hideGUIController(DvvController);
+      }
+      break;
+    case 3:
+      if (!options.constantDiffusion) {
+        hideGUIController(DuController);
+        hideGUIController(DvController);
+        hideGUIController(DwController);
+        showGUIController(DuuController);
+        showGUIController(DuvController);
+        showGUIController(DuwController);
+        showGUIController(DvuController);
+        showGUIController(DvvController);
+        showGUIController(DvwController);
+        showGUIController(DwuController);
+        showGUIController(DwvController);
+        showGUIController(DwwController);
+      } else {
+        showGUIController(DuController);
+        showGUIController(DvController);
+        showGUIController(DwController);
+        hideGUIController(DuuController);
+        hideGUIController(DuvController);
+        hideGUIController(DuwController);
+        hideGUIController(DvuController);
+        hideGUIController(DvvController);
+        hideGUIController(DvwController);
+        hideGUIController(DwuController);
+        hideGUIController(DwvController);
+        hideGUIController(DwwController);
+      }
+      break;
+  }
 }
