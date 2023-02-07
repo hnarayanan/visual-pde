@@ -35,7 +35,8 @@ let gui,
   whatToPlotController,
   minColourValueController,
   maxColourValueController,
-  autoMinMaxColourRangeController,
+  setColourRangeController,
+  autoSetColourRangeController,
   clearValueUController,
   clearValueVController,
   clearValueWController,
@@ -124,7 +125,7 @@ funsObj = {
     str = "case: PRESETNAME:\n\toptions = " + str + ";\nbreak;";
     navigator.clipboard.writeText(str);
   },
-  autoMinMaxColourRange: function () {
+  setColourRange: function () {
     let valRange = getMinMaxVal();
     if (valRange[0] == valRange[1]) {
       // If the range is just one value, add one to the second entry.
@@ -638,13 +639,6 @@ function initGUI(startOpen) {
       .onChange(function () {
         setNonConstantDiffusionGUI();
         setRDEquations();
-        if (!options.constantDiffusion) {
-          options.setTimestepForStability = false;
-          refreshGUI(gui);
-          hideGUIController(lockCFLController);
-        } else {
-          showGUIController(lockCFLController);
-        }
       });
   }
   // Du and Dv.
@@ -900,10 +894,21 @@ function initGUI(startOpen) {
       });
     maxColourValueController.__precision = 2;
   }
-  if (inGUI("autoMinMaxColourRange")) {
-    autoMinMaxColourRangeController = root
-      .add(funsObj, "autoMinMaxColourRange")
-      .name("Auto colour");
+  if (inGUI("setColourRange")) {
+    setColourRangeController = root
+      .add(funsObj, "setColourRange")
+      .name("Snap range");
+  }
+  if (inGUI("autoColourRangeButton")) {
+    autoSetColourRangeController = root
+      .add(options, "autoSetColourRange")
+      .name("Auto snap?")
+      .onChange(function () {
+        if (options.autoSetColourRange) {
+          funsObj.setColourRange();
+          render();
+        }
+      });
   }
 
   // Miscellaneous folder.
@@ -1139,6 +1144,11 @@ function timestep() {
 }
 
 function render() {
+  // If selected, set the colour range.
+  if (options.autoSetColourRange) {
+    funsObj.setColourRange();
+  }
+
   // Perform any postprocessing.
   if (readFromTextureB) {
     inTex = simTextureB;
@@ -1571,9 +1581,11 @@ function setNumberOfSpecies() {
 
       // Set the diffusion of w to zero to prevent it from causing numerical instability.
       if (!options.constantDiffusion) {
-        options.nonconstantDiffusionStrUV = "0.0";
-        options.nonconstantDiffusionStrVU = "0.0";
-        options.nonconstantDiffusionStrVV = "0.0";
+        options.nonconstantDiffusionStrUW = "0.0";
+        options.nonconstantDiffusionStrVW = "0.0";
+        options.nonconstantDiffusionStrWU = "0.0";
+        options.nonconstantDiffusionStrWV = "0.0";
+        options.nonconstantDiffusionStrWW = "0.0";
       } else {
         options.diffusionW = 0;
       }
@@ -1786,12 +1798,14 @@ function updateWhatToPlot() {
     setPostFunMaxFragShader();
     hideGUIController(minColourValueController);
     hideGUIController(maxColourValueController);
-    hideGUIController(autoMinMaxColourRangeController);
+    hideGUIController(setColourRangeController);
+    hideGUIController(autoSetColourRangeController);
   } else {
     setPostFunFragShader();
     showGUIController(minColourValueController);
     showGUIController(maxColourValueController);
-    showGUIController(autoMinMaxColourRangeController);
+    showGUIController(setColourRangeController);
+    showGUIController(autoSetColourRangeController);
   }
   render();
 }
@@ -1869,7 +1883,7 @@ function getMinMaxVal() {
   renderer.readRenderTargetPixels(postTexture, 0, 0, nXDisc, nYDisc, buffer);
   let minVal = Infinity;
   let maxVal = -Infinity;
-  for (let i = 0; i < buffer.length / 4; i += 4) {
+  for (let i = 0; i < buffer.length; i += 4) {
     minVal = Math.min(minVal, buffer[i]);
     maxVal = Math.max(maxVal, buffer[i]);
   }
@@ -1916,6 +1930,14 @@ function setPostFunMaxFragShader() {
 }
 
 function setNonConstantDiffusionGUI() {
+  if (!options.constantDiffusion) {
+    options.setTimestepForStability = false;
+    refreshGUI(gui);
+    hideGUIController(lockCFLController);
+  } else {
+    showGUIController(lockCFLController);
+  }
+
   switch (parseInt(options.numSpecies)) {
     case 1:
       if (!options.constantDiffusion) {
