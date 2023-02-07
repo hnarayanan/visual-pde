@@ -3,20 +3,20 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>Get started | VisualPDE</title>
+<title>Logistic travelling waves | VisualPDE</title>
 <meta name="generator" content="Jekyll v3.9.2" />
-<meta property="og:title" content="Get started" />
+<meta property="og:title" content="Logistic travelling waves" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Interactive live solutions of PDE systems, right on your device" />
 <meta property="og:description" content="Interactive live solutions of PDE systems, right on your device" />
-<link rel="canonical" href="http://localhost:4000/" />
-<meta property="og:url" content="http://localhost:4000/" />
+<link rel="canonical" href="http://localhost:4000/bistable-travelling-waves/" />
+<meta property="og:url" content="http://localhost:4000/bistable-travelling-waves/" />
 <meta property="og:site_name" content="VisualPDE" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Get started" />
+<meta property="twitter:title" content="Logistic travelling waves" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebSite","description":"Interactive live solutions of PDE systems, right on your device","headline":"Get started","name":"VisualPDE","url":"http://localhost:4000/"}</script>
+{"@context":"https://schema.org","@type":"WebPage","description":"Interactive live solutions of PDE systems, right on your device","headline":"Logistic travelling waves","url":"http://localhost:4000/bistable-travelling-waves/"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="VisualPDE" /><link rel="stylesheet" href="/assets/css/custom.css"></head><body><header class="site-header">
     <div class="wrapper"><a class="site-title" rel="author" href="/">VisualPDE</a><nav class="site-nav">
@@ -32,39 +32,47 @@
             <div class="trigger"><a class="page-link" href="/about/">About</a><a class="nav-button" href="/sim">Play!</a>
             </div>
             </nav></div>
-</header><div class="home-banner">
-        <div class='home-banner-subtitle'>Interactive live solutions of PDE systems</div>
-        <br />
-        <div class='home-banner-title'>right on your device.</div>
-    </div>
-    <main class="page-content" aria-label="Content">
+</header><main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <h2 id="get-started">Get started</h2>
-<p><a class="home_tile" href="heat-equation">
-    <img src="/assets/images/heat-equation.png" alt="" />
-    The heat equation<br />
-    $\pd{u}{t} = \nabla^2 u$
-</a></p>
+        <article class="post">
 
-<h2 id="logistic-growth-invasion-wavespeeds-and-boundary-induced-extinction">Logistic growth: invasion wavespeeds and boundary-induced extinction</h2>
-<p><a class="home_tile" href="travelling-waves">
-    <img src="/assets/images/travelling-waves.png" alt="" />
-    Logistic travelling waves<br />
-    $\pd{u}{t} = \nabla^2 u + ru\left(1-\frac{u}{K}\right)$
-</a>
-<a class="home_tile" href="harsh-environment">
-    <img src="/assets/images/harsh-environment.png" alt="" />
-    Survival in a harsh environment<br />
-    $\pd{u}{t} = \nabla^2 u + ru\left(1-\frac{u}{K}\right)$
-</a></p>
+  <header class="post-header">
+    <h1 class="post-title">Logistic travelling waves</h1>
+  </header>
 
-<h2 id="thresholds-and-bistability-in-space">Thresholds and bistability in space</h2>
-<ul>
-  <li><a href="bistable-thresholds">Threshold simulation</a></li>
-  <li>Spatial homogeneity localises patterns</li>
-  <li>Turing localisation on Turing’s face</li>
-</ul>
+  <div class="post-content">
+    <p>TODO MAKE THIS</p>
 
+<p>Next we’ll consider a classical reaction–diffusion equation, with a logistic nonlinearity. This is often referred to as the <a href="[https://en.wikipedia.org/wiki/Heat_equation](https://en.wikipedia.org/wiki/Fisher%27s_equation)">Fisher–KPP equation</a>,</p>
+
+\[\pd{u}{t}=\nabla^2 u+ru\left(1-\frac{u}{K}\right),\]
+
+<p>with periodic boundary conditions.</p>
+
+<ol>
+  <li>
+    <p>Load the <a href="/sim/?preset=travellingWave">interactive simulation</a>.</p>
+  </li>
+  <li>
+    <p>Click within the box to visualise a ‘line’ of a population, which will then spread out as a planar wave.</p>
+  </li>
+  <li>
+    <p>Explore different parameters in this model, namely $D$, $r$, and $K$.</p>
+  </li>
+  <li>
+    <p>Does the wave speed, $c$, approximately follow the scaling law derived via linearisation of the wavefront (that is, $c \propto \sqrt{rD}$)? One interesting experiment to try is to see what happens if you simultaneously decrease $r$ and increase $D$ (or vice versa). This should have (approximately) the same effective wave speed, but the profile will be different as you have effectively changed the time and space scales in opposite directions.</p>
+  </li>
+  <li>
+    <p>Does the value of the carrying capacity, $K$, matter for the speed of the wave? Or the profile?</p>
+  </li>
+  <li>
+    <p>Next change the brush type to a circle and explore how circular waves travel. These are similar to the planar (effectively 1D) waves above, but their speed will be slightly different as the curvature of these wave fronts will influence their speed.</p>
+  </li>
+</ol>
+
+  </div>
+
+</article>
 
       </div>
     </main><footer class="site-footer h-card">

@@ -3,20 +3,20 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>Get started | VisualPDE</title>
+<title>Bistable thresholds | VisualPDE</title>
 <meta name="generator" content="Jekyll v3.9.2" />
-<meta property="og:title" content="Get started" />
+<meta property="og:title" content="Bistable thresholds" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Interactive live solutions of PDE systems, right on your device" />
 <meta property="og:description" content="Interactive live solutions of PDE systems, right on your device" />
-<link rel="canonical" href="http://localhost:4000/" />
-<meta property="og:url" content="http://localhost:4000/" />
+<link rel="canonical" href="http://localhost:4000/bistable-thresholds/" />
+<meta property="og:url" content="http://localhost:4000/bistable-thresholds/" />
 <meta property="og:site_name" content="VisualPDE" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Get started" />
+<meta property="twitter:title" content="Bistable thresholds" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebSite","description":"Interactive live solutions of PDE systems, right on your device","headline":"Get started","name":"VisualPDE","url":"http://localhost:4000/"}</script>
+{"@context":"https://schema.org","@type":"WebPage","description":"Interactive live solutions of PDE systems, right on your device","headline":"Bistable thresholds","url":"http://localhost:4000/bistable-thresholds/"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="VisualPDE" /><link rel="stylesheet" href="/assets/css/custom.css"></head><body><header class="site-header">
     <div class="wrapper"><a class="site-title" rel="author" href="/">VisualPDE</a><nav class="site-nav">
@@ -32,39 +32,33 @@
             <div class="trigger"><a class="page-link" href="/about/">About</a><a class="nav-button" href="/sim">Play!</a>
             </div>
             </nav></div>
-</header><div class="home-banner">
-        <div class='home-banner-subtitle'>Interactive live solutions of PDE systems</div>
-        <br />
-        <div class='home-banner-title'>right on your device.</div>
-    </div>
-    <main class="page-content" aria-label="Content">
+</header><main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <h2 id="get-started">Get started</h2>
-<p><a class="home_tile" href="heat-equation">
-    <img src="/assets/images/heat-equation.png" alt="" />
-    The heat equation<br />
-    $\pd{u}{t} = \nabla^2 u$
-</a></p>
+        <article class="post">
 
-<h2 id="logistic-growth-invasion-wavespeeds-and-boundary-induced-extinction">Logistic growth: invasion wavespeeds and boundary-induced extinction</h2>
-<p><a class="home_tile" href="travelling-waves">
-    <img src="/assets/images/travelling-waves.png" alt="" />
-    Logistic travelling waves<br />
-    $\pd{u}{t} = \nabla^2 u + ru\left(1-\frac{u}{K}\right)$
-</a>
-<a class="home_tile" href="harsh-environment">
-    <img src="/assets/images/harsh-environment.png" alt="" />
-    Survival in a harsh environment<br />
-    $\pd{u}{t} = \nabla^2 u + ru\left(1-\frac{u}{K}\right)$
-</a></p>
+  <header class="post-header">
+    <h1 class="post-title">Bistable thresholds</h1>
+  </header>
 
-<h2 id="thresholds-and-bistability-in-space">Thresholds and bistability in space</h2>
-<ul>
-  <li><a href="bistable-thresholds">Threshold simulation</a></li>
-  <li>Spatial homogeneity localises patterns</li>
-  <li>Turing localisation on Turing’s face</li>
-</ul>
+  <div class="post-content">
+    <p>We’ll continue studying a cubic reaction–diffusion system which exhibits several phenomena involving bistability:</p>
 
+\[\pd{u}{t}=\nabla^2 u+u(1-u)(u-a),\]
+
+<p>where $a \in (0,1)$ is a given parameter.</p>
+
+<ol>
+  <li>
+    <p>Load the <a href="/sim/preset=harshEnvironment">interactive simulation</a>. TODO: modify json to initialise with Neumann.</p>
+  </li>
+  <li>
+    <p>Click within the box to visualise an initial population in a ‘closed’ environment (that is, using Neumann boundary conditions). Unlike the <a href="heat-equation">heat equation</a>, the total mass is not conserved due to the reaction, but instead the system goes to some uniform steady state profile.</p>
+  </li>
+</ol>
+
+  </div>
+
+</article>
 
       </div>
     </main><footer class="site-footer h-card">

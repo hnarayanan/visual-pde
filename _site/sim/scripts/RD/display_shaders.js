@@ -14,7 +14,7 @@ export function fiveColourDisplay() {
 
     void main()
     {   
-        float value = texture2D(textureSource, textureCoords).COLOURSPEC;
+        float value = texture2D(textureSource, textureCoords).r;
         float scaledValue = (value - minColourValue) / (maxColourValue - minColourValue);
         vec3 col = vec3(0.0, 0.0, 0.0);
         float a = 0.0;
@@ -50,17 +50,12 @@ export function fiveColourDisplay() {
     }`;
 }
 
-export function greyscaleDisplay() {
-  return `varying vec2 textureCoords;
-    uniform sampler2D textureSource;
-    uniform float minColourValue;
-    uniform float maxColourValue;
-
-    void main()
-    {   
-        float value = texture2D(textureSource, textureCoords).COLOURSPEC;
-        float scaledValue = (value - minColourValue) / (maxColourValue - minColourValue);
-        gl_FragColor = vec4(scaledValue, scaledValue, scaledValue, 1.0);
-        
-    }`;
-}
+export function largestSpeciesShader() {
+    return `varying vec2 textureCoords;
+      uniform sampler2D textureSource;
+  
+      void main()
+      {   
+          gl_FragColor = texture2D(textureSource, textureCoords);
+      }`;
+  }
