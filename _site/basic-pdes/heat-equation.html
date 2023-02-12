@@ -3,20 +3,21 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>Logistic travelling waves | VisualPDE</title>
+<title>Get started with the heat equation | VisualPDE</title>
 <meta name="generator" content="Jekyll v3.9.2" />
-<meta property="og:title" content="Logistic travelling waves" />
+<meta property="og:title" content="Get started with the heat equation" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Interactive live solutions of PDE systems, right on your device" />
-<meta property="og:description" content="Interactive live solutions of PDE systems, right on your device" />
-<link rel="canonical" href="http://localhost:4000/travelling-waves/" />
-<meta property="og:url" content="http://localhost:4000/travelling-waves/" />
+<meta name="description" content="Let’s start by solving the heat equation," />
+<meta property="og:description" content="Let’s start by solving the heat equation," />
+<link rel="canonical" href="http://localhost:4000/basic-pdes/heat-equation.html" />
+<meta property="og:url" content="http://localhost:4000/basic-pdes/heat-equation.html" />
 <meta property="og:site_name" content="VisualPDE" />
-<meta property="og:type" content="website" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-02-12T17:51:36+00:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Logistic travelling waves" />
+<meta property="twitter:title" content="Get started with the heat equation" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","description":"Interactive live solutions of PDE systems, right on your device","headline":"Logistic travelling waves","url":"http://localhost:4000/travelling-waves/"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2023-02-12T17:51:36+00:00","datePublished":"2023-02-12T17:51:36+00:00","description":"Let’s start by solving the heat equation,","headline":"Get started with the heat equation","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/basic-pdes/heat-equation.html"},"url":"http://localhost:4000/basic-pdes/heat-equation.html"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="VisualPDE" /><link rel="stylesheet" href="/assets/css/custom.css"></head><body><header class="site-header">
     <div class="wrapper"><a class="site-title" rel="author" href="/">VisualPDE</a><nav class="site-nav">
@@ -37,36 +38,49 @@
         <article class="post">
 
   <header class="post-header">
-    <h1 class="post-title">Logistic travelling waves</h1>
+    <h1 class="post-title">Get started with the heat equation</h1>
   </header>
 
   <div class="post-content">
-    <p>Next we’ll consider a classical reaction–diffusion equation, with a logistic nonlinearity. This is often referred to as the <a href="[https://en.wikipedia.org/wiki/Heat_equation](https://en.wikipedia.org/wiki/Fisher%27s_equation)">Fisher–KPP equation</a>,</p>
+    <p>Let’s start by solving the <a href="https://en.wikipedia.org/wiki/Heat_equation">heat equation</a>,</p>
 
-\[\pd{u}{t}=\nabla^2 u+ru\left(1-\frac{u}{K}\right),\]
+\[\pd{u}{t}=D \nabla^2 u,\]
 
-<p>with periodic boundary conditions.</p>
+<p>with homogeneous Neumann (aka no-flux) boundary conditions.</p>
 
 <ol>
   <li>
-    <p>Load the <a href="/sim/?preset=travellingWave">interactive simulation</a>.</p>
+    <p>Load the <a href="/sim/?preset=heatEquation">interactive simulation</a>.</p>
   </li>
   <li>
-    <p>Click within the box to visualise a ‘line’ of a population, which will then spread out as a planar wave.</p>
+    <p>Click within the box to visualise the spread of some source of heat throughout the domain.</p>
   </li>
   <li>
-    <p>Explore different parameters in this model, namely $D$, $r$, and $K$.</p>
+    <p>You can increase the diffusion coefficient (for example, by removing a zero) to increase how fast this blob spreads out throughout the domain.</p>
   </li>
   <li>
-    <p>Does the wave speed, $c$, approximately follow the scaling law derived via linearisation of the wavefront (that is, $c \propto \sqrt{rD}$)? One interesting experiment to try is to see what happens if you simultaneously decrease $r$ and increase $D$ (or vice versa). This should have (approximately) the same effective wave speed, but the profile will be different as you have effectively changed the time and space scales in opposite directions.</p>
+    <p>You can also click around the corners/edges to see how the boundary conditions conserves the total amount of heat within the domain.</p>
   </li>
   <li>
-    <p>Does the value of the carrying capacity, $K$, matter for the speed of the wave? Or the profile?</p>
+    <p>Press clear at the top right to reset the simulation.</p>
   </li>
   <li>
-    <p>Next change the brush type to a circle and explore how circular waves travel. These are similar to the planar (effectively 1D) waves above, but their speed will be slightly different as the curvature of these wave fronts will influence their speed.</p>
+    <p>You can also pause the simulation, paint some initial data, and then click ‘play’ to set it in motion. Explore how the speed depends on the diffusion coefficient (though note that this coefficient can’t be too large without running into numerical problems – see the discussion on Forward Euler ELSEWHERE).</p>
   </li>
 </ol>
+
+<h2 id="playing-with-boundary-conditions">Playing with boundary conditions</h2>
+
+<ol>
+  <li>
+    <p>Now, go to <code class="language-plaintext highlighter-rouge">Boundary conditions</code> and select <code class="language-plaintext highlighter-rouge">Periodic</code>. What do you notice? Is the total amount of heat still conserved?</p>
+  </li>
+  <li>
+    <p>What if you change it to Dirichlet?</p>
+  </li>
+</ol>
+
+<p>Explore how heat flows through the domain under these different scenarios.</p>
 
   </div>
 

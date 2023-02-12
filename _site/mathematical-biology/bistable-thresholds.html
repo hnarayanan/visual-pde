@@ -3,20 +3,21 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>Get started with the heat equation | VisualPDE</title>
+<title>Bistable thresholds | VisualPDE</title>
 <meta name="generator" content="Jekyll v3.9.2" />
-<meta property="og:title" content="Get started with the heat equation" />
+<meta property="og:title" content="Bistable thresholds" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Interactive live solutions of PDE systems, right on your device" />
-<meta property="og:description" content="Interactive live solutions of PDE systems, right on your device" />
-<link rel="canonical" href="http://localhost:4000/heat-equation/" />
-<meta property="og:url" content="http://localhost:4000/heat-equation/" />
+<meta name="description" content="We’ll continue studying a cubic reaction–diffusion system which exhibits several phenomena involving bistability:" />
+<meta property="og:description" content="We’ll continue studying a cubic reaction–diffusion system which exhibits several phenomena involving bistability:" />
+<link rel="canonical" href="http://localhost:4000/mathematical-biology/bistable-thresholds.html" />
+<meta property="og:url" content="http://localhost:4000/mathematical-biology/bistable-thresholds.html" />
 <meta property="og:site_name" content="VisualPDE" />
-<meta property="og:type" content="website" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-02-12T17:51:36+00:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Get started with the heat equation" />
+<meta property="twitter:title" content="Bistable thresholds" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","description":"Interactive live solutions of PDE systems, right on your device","headline":"Get started with the heat equation","url":"http://localhost:4000/heat-equation/"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2023-02-12T17:51:36+00:00","datePublished":"2023-02-12T17:51:36+00:00","description":"We’ll continue studying a cubic reaction–diffusion system which exhibits several phenomena involving bistability:","headline":"Bistable thresholds","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/mathematical-biology/bistable-thresholds.html"},"url":"http://localhost:4000/mathematical-biology/bistable-thresholds.html"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="VisualPDE" /><link rel="stylesheet" href="/assets/css/custom.css"></head><body><header class="site-header">
     <div class="wrapper"><a class="site-title" rel="author" href="/">VisualPDE</a><nav class="site-nav">
@@ -37,49 +38,24 @@
         <article class="post">
 
   <header class="post-header">
-    <h1 class="post-title">Get started with the heat equation</h1>
+    <h1 class="post-title">Bistable thresholds</h1>
   </header>
 
   <div class="post-content">
-    <p>Let’s start by solving the <a href="https://en.wikipedia.org/wiki/Heat_equation">heat equation</a>,</p>
+    <p>We’ll continue studying a cubic reaction–diffusion system which exhibits several phenomena involving bistability:</p>
 
-\[\pd{u}{t}=\nabla^2 u,\]
+\[\pd{u}{t}=\nabla^2 u+u(1-u)(u-a),\]
 
-<p>with homogeneous Neumann (aka no-flux) boundary conditions.</p>
-
-<ol>
-  <li>
-    <p>Load the <a href="/sim/?preset=heatEquation">interactive simulation</a>.</p>
-  </li>
-  <li>
-    <p>Click within the box to visualise the spread of some source of heat throughout the domain.</p>
-  </li>
-  <li>
-    <p>You can increase the diffusion coefficient (for example, by removing a zero) to increase how fast this blob spreads out throughout the domain.</p>
-  </li>
-  <li>
-    <p>You can also click around the corners/edges to see how the boundary conditions conserves the total amount of heat within the domain.</p>
-  </li>
-  <li>
-    <p>Press clear at the top right to reset the simulation.</p>
-  </li>
-  <li>
-    <p>You can also pause the simulation, paint some initial data, and then click ‘play’ to set it in motion. Explore how the speed depends on the diffusion coefficient (though note that this coefficient can’t be too large without running into numerical problems – see the discussion on Forward Euler ELSEWHERE).</p>
-  </li>
-</ol>
-
-<h2 id="playing-with-boundary-conditions">Playing with boundary conditions</h2>
+<p>where $a \in (0,1)$ is a given parameter.</p>
 
 <ol>
   <li>
-    <p>Now, go to <code class="language-plaintext highlighter-rouge">Boundary conditions</code> and select <code class="language-plaintext highlighter-rouge">Periodic</code>. What do you notice? Is the total amount of heat still conserved?</p>
+    <p>Load the <a href="/sim/preset=harshEnvironment">interactive simulation</a>. TODO: modify json to initialise with Neumann.</p>
   </li>
   <li>
-    <p>What if you change it to Dirichlet?</p>
+    <p>Click within the box to visualise an initial population in a ‘closed’ environment (that is, using Neumann boundary conditions). Unlike the <a href="heat-equation">heat equation</a>, the total mass is not conserved due to the reaction, but instead the system goes to some uniform steady state profile.</p>
   </li>
 </ol>
-
-<p>Explore how heat flows through the domain under these different scenarios.</p>
 
   </div>
 

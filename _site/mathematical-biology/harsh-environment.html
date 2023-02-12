@@ -3,20 +3,21 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>Bistable thresholds | VisualPDE</title>
+<title>Survival in a harsh environment | VisualPDE</title>
 <meta name="generator" content="Jekyll v3.9.2" />
-<meta property="og:title" content="Bistable thresholds" />
+<meta property="og:title" content="Survival in a harsh environment" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Interactive live solutions of PDE systems, right on your device" />
-<meta property="og:description" content="Interactive live solutions of PDE systems, right on your device" />
-<link rel="canonical" href="http://localhost:4000/bistable-thresholds/" />
-<meta property="og:url" content="http://localhost:4000/bistable-thresholds/" />
+<meta name="description" content="We’ll continue studying the logistic reaction-diffusion model," />
+<meta property="og:description" content="We’ll continue studying the logistic reaction-diffusion model," />
+<link rel="canonical" href="http://localhost:4000/mathematical-biology/harsh-environment.html" />
+<meta property="og:url" content="http://localhost:4000/mathematical-biology/harsh-environment.html" />
 <meta property="og:site_name" content="VisualPDE" />
-<meta property="og:type" content="website" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-02-12T17:51:36+00:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Bistable thresholds" />
+<meta property="twitter:title" content="Survival in a harsh environment" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebPage","description":"Interactive live solutions of PDE systems, right on your device","headline":"Bistable thresholds","url":"http://localhost:4000/bistable-thresholds/"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2023-02-12T17:51:36+00:00","datePublished":"2023-02-12T17:51:36+00:00","description":"We’ll continue studying the logistic reaction-diffusion model,","headline":"Survival in a harsh environment","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/mathematical-biology/harsh-environment.html"},"url":"http://localhost:4000/mathematical-biology/harsh-environment.html"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="VisualPDE" /><link rel="stylesheet" href="/assets/css/custom.css"></head><body><header class="site-header">
     <div class="wrapper"><a class="site-title" rel="author" href="/">VisualPDE</a><nav class="site-nav">
@@ -37,19 +38,19 @@
         <article class="post">
 
   <header class="post-header">
-    <h1 class="post-title">Bistable thresholds</h1>
+    <h1 class="post-title">Survival in a harsh environment</h1>
   </header>
 
   <div class="post-content">
-    <p>We’ll continue studying a cubic reaction–diffusion system which exhibits several phenomena involving bistability:</p>
+    <p>We’ll continue studying the logistic reaction-diffusion model,</p>
 
-\[\pd{u}{t}=\nabla^2 u+u(1-u)(u-a),\]
+\[\pd{u}{t}=D\nabla^2 u+ru\left(1-\frac{u}{K}\right),\]
 
-<p>where $a \in (0,1)$ is a given parameter.</p>
+<p>but now consider different boundary conditions.</p>
 
 <ol>
   <li>
-    <p>Load the <a href="/sim/preset=harshEnvironment">interactive simulation</a>. TODO: modify json to initialise with Neumann.</p>
+    <p>Load the <a href="/sim/?preset=harshEnvironment">interactive simulation</a>. TODO: modify json to initialize with Neumann.</p>
   </li>
   <li>
     <p>Click within the box to visualise an initial population in a ‘closed’ environment (that is, using Neumann boundary conditions). Unlike the <a href="heat-equation">heat equation</a>, the total mass is not conserved due to the reaction, but instead the system goes to some uniform steady state profile.</p>

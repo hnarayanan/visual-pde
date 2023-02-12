@@ -3,20 +3,21 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>VisualPDE | Interactive live solutions of PDE systems, right on your device</title>
+<title>Bistable travelling waves | VisualPDE</title>
 <meta name="generator" content="Jekyll v3.9.2" />
-<meta property="og:title" content="VisualPDE" />
+<meta property="og:title" content="Bistable travelling waves" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Interactive live solutions of PDE systems, right on your device" />
-<meta property="og:description" content="Interactive live solutions of PDE systems, right on your device" />
-<link rel="canonical" href="http://localhost:4000/" />
-<meta property="og:url" content="http://localhost:4000/" />
+<meta name="description" content="TODO MAKE THIS" />
+<meta property="og:description" content="TODO MAKE THIS" />
+<link rel="canonical" href="http://localhost:4000/mathematical-biology/bistable-travelling-waves.html" />
+<meta property="og:url" content="http://localhost:4000/mathematical-biology/bistable-travelling-waves.html" />
 <meta property="og:site_name" content="VisualPDE" />
-<meta property="og:type" content="website" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-02-12T17:51:36+00:00" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="VisualPDE" />
+<meta property="twitter:title" content="Bistable travelling waves" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebSite","description":"Interactive live solutions of PDE systems, right on your device","headline":"VisualPDE","name":"VisualPDE","url":"http://localhost:4000/"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2023-02-12T17:51:36+00:00","datePublished":"2023-02-12T17:51:36+00:00","description":"TODO MAKE THIS","headline":"Bistable travelling waves","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/mathematical-biology/bistable-travelling-waves.html"},"url":"http://localhost:4000/mathematical-biology/bistable-travelling-waves.html"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="VisualPDE" /><link rel="stylesheet" href="/assets/css/custom.css"></head><body><header class="site-header">
     <div class="wrapper"><a class="site-title" rel="author" href="/">VisualPDE</a><nav class="site-nav">
@@ -32,60 +33,47 @@
             <div class="trigger"><a class="page-link" href="/about/">About</a><a class="nav-button" href="/sim">Play!</a>
             </div>
             </nav></div>
-</header><div class="home-banner">
-        <div class='home-banner-subtitle'>Interactive live solutions of PDE systems</div>
-        <div class='home-banner-title'>right on your device.</div>
-    </div>
-    <main class="page-content" aria-label="Content">
+</header><main class="page-content" aria-label="Content">
       <div class="wrapper">
+        <article class="post">
 
-        <!-- 
-          <a href="">basic-pdes</a><br />
-        
-          <a href="">mathematical-biology</a><br />
-        
-          <a href="">posts</a><br />
-         -->
+  <header class="post-header">
+    <h1 class="post-title">Bistable travelling waves</h1>
+  </header>
 
-        <p>See the solution to your PDE evolve before your eyes. Paint the canvas with initial conditions and see what happens.</p>
+  <div class="post-content">
+    <p>TODO MAKE THIS</p>
 
-<p>Follow a tutorial below or provide your own PDE.</p>
+<p>Next we’ll consider a classical reaction–diffusion equation, with a logistic nonlinearity. This is often referred to as the <a href="[https://en.wikipedia.org/wiki/Heat_equation](https://en.wikipedia.org/wiki/Fisher%27s_equation)">Fisher–KPP equation</a>,</p>
 
+\[\pd{u}{t}=\nabla^2 u+ru\left(1-\frac{u}{K}\right),\]
 
+<p>with periodic boundary conditions.</p>
 
-        <h2>Tutorials</h2>
-        <div class='home_tiles'>
-          <a class='home_tile' href='basic-pdes'>
-            <div class='container'>
-              <img src='/assets/images/heat-equation.png' />
-            </div>
-            <div class='container'>
-              <div class='title'>Basic PDEs</div>
-              <div class='subtitle'>Get stuck in with the heat equation</div>
-              <div class='button'>Browse</div>
-            </div>
-          </a>
-          <a class='home_tile' href='mathematical-biology'>
-            <div class='container'>
-              <img src='/assets/images/squirrel.png' />
-            </div>
-            <div class='container'>
-              <div class='title'>Mathematical biology</div>
-              <div class='subtitle'>Squirrels, waves and patterns</div>
-              <div class='button'>Browse</div>
-            </div>
-          </a>
-          <!-- <a class='home_tile' href='nonlinear-physics'>
-            <div class='container'>
-              <img src='/assets/images/optics.jpg' />
-            </div>
-            <div class='container'>
-              <div class='title'>Nonlinear physics</div>
-              <div class='subtitle'>Optics, QFT and the rest</div>
-              <div class='button'>Browse</div>
-            </div>
-          </a> -->
-        </div>
+<ol>
+  <li>
+    <p>Load the <a href="/sim/?preset=travellingWave">interactive simulation</a>.</p>
+  </li>
+  <li>
+    <p>Click within the box to visualise a ‘line’ of a population, which will then spread out as a planar wave.</p>
+  </li>
+  <li>
+    <p>Explore different parameters in this model, namely $D$, $r$, and $K$.</p>
+  </li>
+  <li>
+    <p>Does the wave speed, $c$, approximately follow the scaling law derived via linearisation of the wavefront (that is, $c \propto \sqrt{rD}$)? One interesting experiment to try is to see what happens if you simultaneously decrease $r$ and increase $D$ (or vice versa). This should have (approximately) the same effective wave speed, but the profile will be different as you have effectively changed the time and space scales in opposite directions.</p>
+  </li>
+  <li>
+    <p>Does the value of the carrying capacity, $K$, matter for the speed of the wave? Or the profile?</p>
+  </li>
+  <li>
+    <p>Next change the brush type to a circle and explore how circular waves travel. These are similar to the planar (effectively 1D) waves above, but their speed will be slightly different as the curvature of these wave fronts will influence their speed.</p>
+  </li>
+</ol>
+
+  </div>
+
+</article>
 
       </div>
     </main><footer class="site-footer h-card">
